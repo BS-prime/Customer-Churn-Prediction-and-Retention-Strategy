@@ -15,7 +15,6 @@ class DecisionEngine:
         return (prob * self.success_rate * clv) - self.offer_cost
 
     def decide(self, df, probs):
-
         clv = self.compute_clv(df)
         profit = self.expected_profit(probs, clv)
 

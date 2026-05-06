@@ -1,18 +1,20 @@
+import pandas
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.model_selection import train_test_split, GridSearchCV
 from xgboost import XGBClassifier
 import joblib
+
 
 class ChurnModel:
 
     def __init__(self):
         self.pipeline = None
 
-    def build_pipeline(self, X):
-
-        cat_cols = X.select_dtypes(include="object").columns
-        num_cols = X.select_dtypes(exclude="object").columns
+    def build_pipeline(self, df: pandas.DataFrame):
+        cat_cols = df.select_dtypes(include="object").columns
+        num_cols = df.select_dtypes(exclude="object").columns
 
         preprocessor = ColumnTransformer([
             ("cat", OneHotEncoder(handle_unknown="ignore"), cat_cols),
