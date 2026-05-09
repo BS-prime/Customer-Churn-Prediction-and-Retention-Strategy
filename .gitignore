@@ -6,6 +6,11 @@ dist/
 wheels/
 *.egg-info
 .idea
+customer_churn_prediction_and_retention_strategy.egg-info
+
+# projects redundancies
+logs/
+report/
 
 # Virtual environments
 .venv

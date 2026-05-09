@@ -283,7 +283,7 @@ wheels = [
 [[package]]
 name = "customer-churn-prediction-and-retention-strategy"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
     { name = "fastparquet" },
