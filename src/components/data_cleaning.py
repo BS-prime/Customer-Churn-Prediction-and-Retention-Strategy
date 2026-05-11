@@ -3,23 +3,6 @@ import numpy as np
 import pandas as pd
 
 
-def _null_value_handling(dataframe: pd.DataFrame):
-    """
-    fill null values in dataframe
-    :param dataframe:
-    :return: pandas DataFrame
-    """
-
-    # fill null values in Churn Reason with N/A
-    dataframe["Churn Reason"] = dataframe["Churn Reason"].fillna("N/A")
-
-    # replace the null values with median
-    dataframe["Total Charges"] = dataframe["Total Charges"].replace(" ", np.nan)
-    dataframe["Total Charges"] = dataframe["Total Charges"].replace(" ", dataframe["Total Charges"].median())
-
-    return dataframe
-
-
 def _fixing_datatype(dataframe: pd.DataFrame) -> pd.DataFrame:
     """
     Fixing datatypes in dataframe
@@ -67,7 +50,6 @@ def data_cleaner(dataframe: pd.DataFrame) -> pd.DataFrame:
     :return: the cleaned dataframe
     """
 
-    dataframe = _null_value_handling(dataframe)
     dataframe = _fixing_datatype(dataframe)
     dataframe = _drop_columns(dataframe)
 
