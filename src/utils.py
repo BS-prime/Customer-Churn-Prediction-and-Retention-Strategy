@@ -29,6 +29,11 @@ def save_object(filepath: Path, obj: pickle):
 
 
 def set_seed(seed):
+    """
+    This function sets random seed.
+    :param seed:
+    :return:
+    """
     np.random.seed(seed)
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)

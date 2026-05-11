@@ -22,7 +22,8 @@ def data_ingestion(path: Path = config["data"]["path"]):
     """
     try:
         logging.info(f"Loading data from {path}")
-        df = pd.read_excel(ROOT_DIR / path)
+        df: pd.DataFrame = pd.read_excel(ROOT_DIR / path)
+        return df
 
     except Exception as e:
         raise CustomException(e, sys)
