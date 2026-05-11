@@ -33,11 +33,7 @@ def _drop_columns(dataframe: pd.DataFrame) -> pd.DataFrame:
             "Count",
             "Country",
             "State",
-            "CustomerID",
-            "Lat Long",
-            "Latitude",
-            "Longitude",
-            "Zip Code",
+            "CustomerID"
         ]
     )
     return dataframe

@@ -11,6 +11,7 @@ from src.config import load_config
 # import libraries
 import pandas as pd
 
+# initiate the config
 config = load_config()
 
 # locate the root directory
@@ -20,7 +21,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 def _input_output_split(df: pd.DataFrame):
     """
     Helper to split data into input and output features
-    :param df:
+    :param df: pandas.DataFrame
     :return: the input and output dataframe
     """
     X = df.drop("Churn Value", axis=1)
@@ -35,20 +36,19 @@ def _train_test_split(
         random_state: int = config["data"]["random_state"]
 ):
     """
-    Helper to perform train and test split
-    :param data: pandas dataframe
+    Helper function to split data into train and test
+    :param X: pandas.DataFrame
+    :param y: pandas Series
     :param test_size: float
-    :return: X_train, X_test, y_train, y_test
+    :param random_state: int
+    :return:
     """
 
-    # train test data
-    X_train, X_test, y_train, y_test = train_test_split(X,
-                                                        y,
-                                                        test_size=test_size,
-                                                        random_state=random_state
-                                                        )
-
-    return X_train, X_test, y_train, y_test
+    return train_test_split(X,
+                            y,
+                            test_size=test_size,
+                            random_state=random_state
+                            )
 
 
 def load_csv(path: Path = config["data"]["path"]):
@@ -67,8 +67,9 @@ def load_csv(path: Path = config["data"]["path"]):
         logging.info(f"Shape of y: {y.shape}")
 
         logging.info("Performing train and test split")
+        X_train, X_test, y_train, y_test = _train_test_split(X, y)
 
-        return _train_test_split(X,y)
+        return X_train, X_test, y_train, y_test
 
     except Exception as e:
         raise CustomException(e, sys)
