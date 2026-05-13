@@ -3,6 +3,15 @@ import numpy as np
 import pandas as pd
 
 
+def _handle_missing_values(dataframe: pd.DataFrame) -> pd.DataFrame:
+    """
+    Helper function to handle missing values with np.nans
+    :param dataframe:
+    :return:
+    """
+    dataframe["Total Charges"] = dataframe["Total Charges"].replace(" ", np.nan)
+
+
 def _fixing_datatype(dataframe: pd.DataFrame) -> pd.DataFrame:
     """
     Fixing datatypes in dataframe
@@ -27,7 +36,7 @@ def _drop_columns(dataframe: pd.DataFrame) -> pd.DataFrame:
     :return:
     """
 
-    # Drop the redundant columns in the dataframe
+    # Drop the zero variance columns in the dataframe
     dataframe = dataframe.drop(
         columns=[
             "Count",
@@ -46,6 +55,7 @@ def data_cleaner(dataframe: pd.DataFrame) -> pd.DataFrame:
     :return: the cleaned dataframe
     """
 
+    dataframe = _handle_missing_values(dataframe)
     dataframe = _fixing_datatype(dataframe)
     dataframe = _drop_columns(dataframe)
 

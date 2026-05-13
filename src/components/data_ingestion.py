@@ -18,37 +18,7 @@ config = load_config()
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
 
-def _input_output_split(df: pd.DataFrame):
-    """
-    Helper to split data into input and output features
-    :param df: pandas.DataFrame
-    :return: the input and output dataframe
-    """
-    X = df.drop("Churn Value", axis=1)
-    y = df["Churn Value"]
-    return X, y
 
-
-def _train_test_split(
-        X: pd.DataFrame,
-        y: pd.Series,
-        test_size: float = config["data"]["test_size"],
-        random_state: int = config["data"]["random_state"]
-):
-    """
-    Helper function to split data into train and test
-    :param X: pandas.DataFrame
-    :param y: pandas Series
-    :param test_size: float
-    :param random_state: int
-    :return:
-    """
-
-    return train_test_split(X,
-                            y,
-                            test_size=test_size,
-                            random_state=random_state
-                            )
 
 
 def load_csv(path: Path = config["data"]["path"]):
