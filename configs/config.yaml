@@ -39,5 +39,8 @@ training:
   seed: 42
 
 output:
+  train_feature_path: artifacts/features/train.csv
+  test_feature_path: artifacts/features/test.csv
+  preprocessor_path: artifacts/preprocessor.pkl
   model_path: models/model.joblib
   metrics_path: artifacts/metrics.json
