@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from numpy import dtype, ndarray
+from pandas import DataFrame, Series
 
 from src.exception import CustomException
 from src.logger import logging
@@ -248,7 +249,7 @@ def _create_preprocessor(
             ("card", card_pipeline, card_columns),
         ])
 
-        logging.info(f"Steps of preprocessor: {preprocessor.steps}")
+        logging.info("Preprocessor initialized}")
 
         return preprocessor
 
@@ -267,7 +268,7 @@ def _initiate_data_transformation(
         X_test: pd.DataFrame,
         y_test: pd.Series,
         config_data=config["output"],
-) -> tuple[np.ndarray, np.ndarray, Path]:
+) -> Path:
     """
     Helper to transform the data, save features and save the preprocessor object
     :param preprocessor_obj: ColumnTransformer object
@@ -300,8 +301,6 @@ def _initiate_data_transformation(
         test_arr.to_csv(config_data["test_feature_path"], index=False, header=True)
 
         return (
-            train_arr,
-            test_arr,
             config_data["preprocessor_path"]
         )
 
@@ -313,13 +312,13 @@ def _initiate_data_transformation(
 # --- 10. Combine all the helpers to perform feature engineering ---
 # =================================================================================================
 
-def feature_engineering(df: pd.DataFrame) -> tuple[
-    ndarray[tuple[Any, ...], dtype[Any]], ndarray[tuple[Any, ...], dtype[Any]], Path
-]:
+def feature_engineering(
+        df: pd.DataFrame
+) -> tuple[DataFrame, DataFrame, Series, Series, Path]:
     """
     Combine all the helpers to perform feature engineering
     :param df: pandas DataFrame
-    :return: data
+    :return: X_train, X_test, y_train, y_test, and Object file path
     """
 
     X, y = _input_output_split(df=df)
@@ -344,12 +343,11 @@ def feature_engineering(df: pd.DataFrame) -> tuple[
                                             cat_columns=cat_columns
                                             )
 
-    train_arr, test_arr, preprocessor_file_path = _initiate_data_transformation(preprocessor_obj=preprocessor_obj,
-                                                                                X_train=X_train,
-                                                                                y_train=y_train,
-                                                                                X_test=X_test,
-                                                                                y_test=y_test,
-                                                                                )
-    
+    preprocessor_file_path = _initiate_data_transformation(preprocessor_obj=preprocessor_obj,
+                                                           X_train=X_train,
+                                                           y_train=y_train,
+                                                           X_test=X_test,
+                                                           y_test=y_test,
+                                                           )
 
-    return train_arr, test_arr, preprocessor_file_path
+    return X_train, X_test, y_train, y_test, preprocessor_file_path
