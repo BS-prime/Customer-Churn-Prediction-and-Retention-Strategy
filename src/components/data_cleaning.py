@@ -11,6 +11,8 @@ def _handle_missing_values(dataframe: pd.DataFrame) -> pd.DataFrame:
     """
     dataframe["Total Charges"] = dataframe["Total Charges"].replace(" ", np.nan)
 
+    return dataframe
+
 
 def _fixing_datatype(dataframe: pd.DataFrame) -> pd.DataFrame:
     """

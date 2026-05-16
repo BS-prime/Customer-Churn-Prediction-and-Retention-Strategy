@@ -1,43 +1,39 @@
 # import modules
-import pickle
-from pathlib import Path
 import sys
 import dill
-import random
-import os
+from pathlib import Path
+
 from exception import CustomException
 
-# import libraries
-import numpy as np
 
-# locate the root directory
-ROOT_DIR = Path(__file__).parent.parent.parent
-
-
-def save_object(filepath: Path, obj: pickle):
+def save_object(filepath: Path | str, obj):
     """
-    This function saves object in a pickle file.
-    :param filepath: str
+    This function saves an object directly at the root node directory
+    if a filename or relative path is provided.
+    :param filepath: Path | str
     :param obj: object
     :return: Nothing
     """
     try:
-        dir_name = ROOT_DIR / filepath.parent.name
-        Path(dir_name).mkdir(parents=True, exist_ok=True)
+        # locate the root directory
+        ROOT_DIR = Path(__file__).parent.parent
 
-        with open(filepath, 'wb') as file:
-            dill.dump(obj, file)
+        # create the file object
+        path_obj = Path(filepath)
+
+        # check if the path is root
+        if not path_obj.is_absolute():
+            file_path = (ROOT_DIR / path_obj).resolve()
+        else:
+            file_path = path_obj.resolve()
+
+        # 2. Extract and create the directory component cleanly
+        dir_path = file_path.parent
+        dir_path.mkdir(parents=True, exist_ok=True)
+
+        # 3. Save the binary file payload
+        with open(file_path, "wb") as file_obj:
+            dill.dump(obj, file_obj)
 
     except Exception as e:
         raise CustomException(e, sys)
-
-
-def set_seed(seed):
-    """
-    This function sets random seed.
-    :param seed:
-    :return:
-    """
-    np.random.seed(seed)
-    random.seed(seed)
-    os.environ["PYTHONHASHSEED"] = str(seed)

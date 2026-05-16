@@ -1,5 +1,10 @@
 import yaml
+from pathlib import Path
 
-def load_config(path:str = "configs/config.yaml"):
+# locate the file
+CONFIG_DIR = Path(__file__).parent.parent / "configs" / "config.yaml"
+
+
+def load_config(path: Path = CONFIG_DIR) -> dict:
     with open(path, 'r') as file:
         return yaml.safe_load(file)

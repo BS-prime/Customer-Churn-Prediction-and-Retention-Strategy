@@ -3,8 +3,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from numpy import dtype, ndarray
-from pandas import DataFrame, Series
+from pandas import DataFrame
 
 from src.exception import CustomException
 from src.logger import logging
@@ -25,6 +24,9 @@ from utils import save_object
 
 # load the config
 config = load_config()
+
+# locate the root directory
+ROOT_DIR = Path(__file__).parent.parent.parent
 
 
 # =================================================================================================
@@ -172,16 +174,22 @@ def _select_datatypes_columns(X: pd.DataFrame) -> tuple[list[str], list[str], li
     :return: categorical, cardinal, and numerical column lists
     """
     try:
-        # select the features according to datatype
-        cat_columns = X.select_dtypes(include="object").columns.drop(["City"]).tolist()
-        cardinal_columns = ["City"]
-        num_columns = X.select_dtypes(include="number").columns.tolist()
+        # select cardinal column
+        card_columns = ["City"] if "City" in X.columns else []
+
+        # select numerical columns
+        num_columns = X.select_dtypes(include=["number"]).columns.tolist()
+        num_columns = [col for col in num_columns if col not in card_columns]
+
+        # select categorical columns
+        cat_columns = X.select_dtypes(include=["object", "category"]).columns.tolist()
+        cat_columns = [col for col in cat_columns if col not in card_columns]
 
         logging.info(f"Columns of numerical data: {num_columns}")
-        logging.info(f"Columns of cardinal data: {cardinal_columns}")
+        logging.info(f"Columns of cardinal data: {card_columns}")
         logging.info(f"Columns of categorical data: {cat_columns}")
 
-        return cat_columns, cardinal_columns, num_columns
+        return cat_columns, card_columns, num_columns
 
     except Exception as e:
         raise CustomException(e, sys)
@@ -247,7 +255,7 @@ def _create_preprocessor(
             ("num", num_pipeline, num_columns),
             ("cat", cat_pipeline, cat_columns),
             ("card", card_pipeline, card_columns),
-        ])
+        ], sparse_threshold=0)
 
         logging.info("Preprocessor initialized}")
 
@@ -268,7 +276,7 @@ def _initiate_data_transformation(
         X_test: pd.DataFrame,
         y_test: pd.Series,
         config_data=config["output"],
-) -> Path:
+) -> tuple[Any, Any]:
     """
     Helper to transform the data, save features and save the preprocessor object
     :param preprocessor_obj: ColumnTransformer object
@@ -297,11 +305,27 @@ def _initiate_data_transformation(
         )
 
         # save feature engineered data
-        train_arr.to_csv(config_data["train_feature_path"], index=False, header=True)
-        test_arr.to_csv(config_data["test_feature_path"], index=False, header=True)
+        train_dir = ROOT_DIR / Path(config_data["train_feature_path"]).parent
+        train_dir.mkdir(parents=True, exist_ok=True)
+
+        pd.DataFrame(train_arr).to_csv(
+            train_dir / "train.csv",
+            index=False,
+            header=False
+        )
+
+        test_dir = ROOT_DIR / Path(config_data["test_feature_path"]).parent
+        test_dir.mkdir(parents=True, exist_ok=True)
+
+        pd.DataFrame(test_arr).to_csv(
+            test_dir / "test.csv",
+            index=False,
+            header=False
+        )
 
         return (
-            config_data["preprocessor_path"]
+            train_arr,
+            test_arr,
         )
 
     except Exception as e:
@@ -314,11 +338,11 @@ def _initiate_data_transformation(
 
 def feature_engineering(
         df: pd.DataFrame
-) -> tuple[DataFrame, DataFrame, Series, Series, Path]:
+) -> tuple[DataFrame, DataFrame, Any, Any]:
     """
     Combine all the helpers to perform feature engineering
     :param df: pandas DataFrame
-    :return: X_train, X_test, y_train, y_test, and Object file path
+    :return: X_train, X_test, y_train, y_test
     """
 
     X, y = _input_output_split(df=df)
@@ -331,7 +355,7 @@ def feature_engineering(
 
     X_train, X_test, y_train, y_test = _train_test_split(X, y)
 
-    cat_columns, num_columns, card_columns = _select_datatypes_columns(X=X_train)
+    cat_columns, card_columns, num_columns = _select_datatypes_columns(X=X_train)
 
     num_pipeline, cat_pipeline, card_pipeline = _create_pipelines()
 
@@ -343,11 +367,18 @@ def feature_engineering(
                                             cat_columns=cat_columns
                                             )
 
-    preprocessor_file_path = _initiate_data_transformation(preprocessor_obj=preprocessor_obj,
-                                                           X_train=X_train,
-                                                           y_train=y_train,
-                                                           X_test=X_test,
-                                                           y_test=y_test,
-                                                           )
+    train_arr, test_arr = _initiate_data_transformation(preprocessor_obj=preprocessor_obj,
+                                                        X_train=X_train,
+                                                        y_train=y_train,
+                                                        X_test=X_test,
+                                                        y_test=y_test,
+                                                        )
 
-    return X_train, X_test, y_train, y_test, preprocessor_file_path
+    # train test split the preprocessed data
+    X_train = train_arr[:, :-1]
+    y_train = train_arr[:, -1]
+
+    X_test = test_arr[:, :-1]
+    y_test = test_arr[:, -1]
+
+    return X_train, X_test, y_train, y_test
