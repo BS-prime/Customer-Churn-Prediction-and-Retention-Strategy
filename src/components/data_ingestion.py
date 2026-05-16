@@ -3,13 +3,11 @@ import logging
 import sys
 from pathlib import Path
 
-from sklearn.model_selection import train_test_split
+# import libraries
+import pandas as pd
 
 from exception import CustomException
 from src.config import load_config
-
-# import libraries
-import pandas as pd
 
 # initiate the config
 config = load_config()

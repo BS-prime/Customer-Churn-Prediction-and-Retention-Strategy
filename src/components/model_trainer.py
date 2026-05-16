@@ -1,10 +1,10 @@
 # import libraries
 import sys
+
 import pandas as pd
 import xgboost as xgb
-
-from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV
 
 from src.config import load_config

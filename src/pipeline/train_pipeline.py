@@ -2,16 +2,15 @@
 import sys
 from pathlib import Path
 
-from src.logger import logging
-from src.exception import CustomException
-from src.config import load_config
-
+from components.data_cleaning import data_cleaner
 # Import the functions
 from components.data_ingestion import load_excel
-from components.data_cleaning import data_cleaner
 from components.feature_engineering import feature_engineering
-from components.model_trainer import model_trainer
 from components.model_evaluation import evaluate_models
+from components.model_trainer import model_trainer
+from src.config import load_config
+from src.exception import CustomException
+from src.logger import logging
 from utils import save_object
 
 # Locate the root directory

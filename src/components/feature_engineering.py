@@ -3,23 +3,20 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from pandas import DataFrame
-
-from src.exception import CustomException
-from src.logger import logging
-from src.config import load_config
-
-# import libraries
-import pandas as pd
 import category_encoders as ce
 import numpy as np
-
-from sklearn.model_selection import train_test_split
+# import libraries
+import pandas as pd
+from pandas import DataFrame
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
+from src.config import load_config
+from src.exception import CustomException
+from src.logger import logging
 from utils import save_object
 
 # load the config

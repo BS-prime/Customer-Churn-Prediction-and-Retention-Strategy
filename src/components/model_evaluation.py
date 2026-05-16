@@ -1,7 +1,9 @@
+# import modules
+import json
 import sys
 from pathlib import Path
-import json
 
+# import libraries
 import pandas as pd
 from sklearn.metrics import (
     roc_auc_score,
@@ -12,12 +14,9 @@ from sklearn.metrics import (
     balanced_accuracy_score
 )
 
+from src.config import load_config
 from src.exception import CustomException
 from src.logger import logging
-from src.config import load_config
-
-# load the config file
-config = load_config()
 
 # locate the root directory
 ROOT_DIR = Path(__file__).parents[2]
@@ -26,26 +25,25 @@ ROOT_DIR = Path(__file__).parents[2]
 def evaluate_models(
         models: list,
         X_test: pd.DataFrame,
-        y_test: pd.Series,
-        config_file=config
+        y_test: pd.Series
 ):
     """
     Evaluate models performance
     :param models: list of models
     :param X_test: pd dataframe
     :param y_test: pd Series
-    :param config_file:
     :return:
     """
     try:
-        # initiate variable to hold values
+        config_file = load_config()
+
+        # initiate variable
         all_metrics = {}
         best_model = None
         best_f1 = 0
         best_recall = 0
 
         for model in models:
-
             # extract the model name
             model_name = type(model).__name__
             logging.info(f"Evaluating model {model_name}")
