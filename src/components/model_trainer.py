@@ -14,25 +14,27 @@ from src.logger import logging
 
 def model_trainer(
         X_train: pd.DataFrame,
-        y_train: pd.Series,
-        config_file=load_config()
-)-> list:
+        y_train: pd.Series
+) -> list:
     try:
+        config_file = load_config()
         # map config to actual sklearn classes
         algo_map = {
             "LogisticRegression": LogisticRegression,
             "RandomForestClassifier": RandomForestClassifier,
-            "XGBClassifier": xgb.XGBClassifier
+            "XGBClassifier": xgb.XGBClassifier,
         }
 
         models: list = []
 
         for model_config in config_file["models"].values():
-            model_type = model_config["type"]
+            model_name = model_config["type"]
 
-            base_model = algo_map[model_type](random_state=config_file["training"]["random_state"])
+            base_model = algo_map[model_name](
+                random_state=config_file["training"]["random_state"]
+            )
 
-            logging.info(f"Training model: {model_type}")
+            logging.info(f"Training model: {model_name}")
 
             # initializing GridSearchCV
             grid = GridSearchCV(
@@ -45,9 +47,10 @@ def model_trainer(
 
             # train the model
             grid.fit(X_train, y_train)
-            best_model = grid.best_estimator_
 
-            logging.info(f"Best model: {model_type}")
+            logging.info(f"{model_name} trained successfully!")
+
+            best_model = grid.best_estimator_
 
             # add the models
             models.append(best_model)

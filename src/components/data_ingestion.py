@@ -13,7 +13,7 @@ from src.config import load_config
 config = load_config()
 
 # locate the root directory
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+ROOT_DIR = Path(__file__).resolve().parents[2]
 
 
 def load_excel(path: Path = ROOT_DIR / config["data"]["path"]):
@@ -24,7 +24,10 @@ def load_excel(path: Path = ROOT_DIR / config["data"]["path"]):
     """
     try:
         logging.info(f"Loading data from {path}")
+
         dataframe: pd.DataFrame = pd.read_excel(ROOT_DIR / path)
+
+        logging.info(f"Loaded dataframe: {dataframe.shape}")
 
         return dataframe
 

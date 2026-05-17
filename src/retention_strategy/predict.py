@@ -5,7 +5,8 @@ from pathlib import Path
 from src.config import load_config
 
 # import libraries
-import numpy as np
+import pandas as pd
+
 
 def churn_probability(input_dict: dict) -> float:
     """
@@ -15,7 +16,7 @@ def churn_probability(input_dict: dict) -> float:
     """
 
     # convert the input into an array
-    input_array = np.array(input_dict)
+    input_array = pd.Dataframe(input_dict)
 
     # load the config file
     config = load_config()

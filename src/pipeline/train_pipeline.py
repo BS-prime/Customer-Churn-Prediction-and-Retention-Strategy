@@ -1,26 +1,28 @@
-# import modules
+# Import modules
 import sys
 from pathlib import Path
 
-from components.data_cleaning import data_cleaner
 # Import the functions
 from components.data_ingestion import load_excel
+from components.data_cleaning import data_cleaner
+from components.data_preprocessing import preprocess_data
 from components.feature_engineering import feature_engineering
 from components.model_evaluation import evaluate_models
 from components.model_trainer import model_trainer
+
 from src.config import load_config
 from src.exception import CustomException
 from src.logger import logging
 from utils import save_object
 
 # Locate the root directory
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+ROOT_DIR = Path(__file__).resolve().parents[2]
 
 
 def run_training_pipeline():
     """
-    Use different functions to run the training pipeline
-    :return: best model with metrics
+    Use different functions to run the training pipeline and save the models.
+    :return: best model metrics
     """
     try:
         config = load_config()
@@ -44,38 +46,66 @@ def run_training_pipeline():
         # -----------------------------------------------------------------------------------------------
 
         logging.info("Starting Pipeline: Feature Engineering")
-        X_train, X_test, y_train, y_test = feature_engineering(cleaned_df)
+        X, y = feature_engineering(cleaned_df)
 
         # -----------------------------------------------------------------------------------------------
-        # --- 4. Model Training ---
+        # --- 4. Data Preprocessing ---
+        # -----------------------------------------------------------------------------------------------
+
+        logging.info("Starting Pipeline: Data Preprocessing")
+        X_train, X_test, y_train, y_test, preprocessor_obj = preprocess_data(X=X, y=y)
+
+        # -----------------------------------------------------------------------------------------------
+        # --- 5. Save the preprocessor ---
+        # -----------------------------------------------------------------------------------------------
+
+        logging.info("Saving Preprocessor")
+
+        # Create model directory
+        preprocessor_dir = ROOT_DIR / Path(config["output"]["preprocessor_path"])
+        preprocessor_dir.parent.mkdir(parents=True, exist_ok=True)
+
+        save_object(
+            filepath=preprocessor_dir,
+            obj=preprocessor_obj
+        )
+
+        logging.info(f"Preprocessor saved at: {preprocessor_dir}")
+
+        # -----------------------------------------------------------------------------------------------
+        # --- 5. Model Training ---
         # -----------------------------------------------------------------------------------------------
 
         logging.info("Starting Pipeline: Model Training")
         trained_models = model_trainer(X_train, y_train)
 
         # -----------------------------------------------------------------------------------------------
-        # --- 5. Model Evaluation ---
+        # --- 6. Model Evaluation ---
         # -----------------------------------------------------------------------------------------------
 
         logging.info("Starting Pipeline: Model Evaluation")
         best_model, metrics = evaluate_models(trained_models, X_test, y_test)
 
         # -----------------------------------------------------------------------------------------------
-        # --- 6. save the model ---
+        # --- 7. save the model ---
         # -----------------------------------------------------------------------------------------------
 
         logging.info("Saving the model.")
 
         # Create model directory
-        file_dir = ROOT_DIR / Path(config["output"]["model_path"])
-        file_dir.parent.mkdir(parents=True, exist_ok=True)
+        model_dir = ROOT_DIR / Path(config["output"]["model_path"])
+        model_dir.parent.mkdir(parents=True, exist_ok=True)
 
         save_object(
-            filepath=ROOT_DIR / config["output"]["model_path"],
+            filepath=model_dir,
             obj=best_model
         )
 
-        logging.info("Training Pipeline executed successfully!")
+        logging.info(f"Model saved at: {model_dir}")
+
+        # -----------------------------------------------------------------------------------------------
+        # --- 8. Return statement ---
+        # -----------------------------------------------------------------------------------------------
 
         return metrics
 

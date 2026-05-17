@@ -2,6 +2,8 @@
 import numpy as np
 import pandas as pd
 
+from logger import logging
+
 
 def _handle_missing_values(dataframe: pd.DataFrame) -> pd.DataFrame:
     """
@@ -10,6 +12,8 @@ def _handle_missing_values(dataframe: pd.DataFrame) -> pd.DataFrame:
     :return:
     """
     dataframe["Total Charges"] = dataframe["Total Charges"].replace(" ", np.nan)
+
+    logging.info("Replace null values with np.nans")
 
     return dataframe
 
@@ -27,6 +31,8 @@ def _fixing_datatype(dataframe: pd.DataFrame) -> pd.DataFrame:
 
     # Change the data type of the Total Charges feature
     dataframe["Total Charges"] = dataframe["Total Charges"].astype(float)
+
+    logging.info("Fixing datatypes in dataframe")
 
     return dataframe
 
@@ -47,6 +53,11 @@ def _drop_columns(dataframe: pd.DataFrame) -> pd.DataFrame:
             "CustomerID"
         ]
     )
+
+    logging.info(
+        f"Drop columns zero variance columns from dataframe: {dataframe.shape}"
+    )
+
     return dataframe
 
 
