@@ -14,31 +14,31 @@ models:
       max_iter: [ 1000 ]                      # Ensure convergence, especially with imbalanced data
 
 
-#  RandomForest:
-#    type: "RandomForestClassifier"
-#    params:
-#      n_estimators: [ 500, 1000, 1500 ]                     # More trees help identify rare minority patterns
-#      max_depth: [ 10, 15 ]                                 # Prevents memorizing noise in majority data
-#      min_samples_leaf: [ 10 ]                              # Ensures leaves are statistically significant, reducing false positives
-#      max_features: [ "sqrt", "log2" ]                      # Standard for diverse trees in ensemble
-#      bootstrap: [ true ]
-#      n_jobs: [ -1 ]                                        # Use all available CPU cores for speed
-#
-#
-#  xgboost:
-#    type: "XGBClassifier"
-#    params:
-#      scale_pos_weight: [ 73.4 ]
-#      max_depth: [ 3, 6 ]                     # Shallow trees are more robust for rare events
-#      min_child_weight: [ 10, 15, 20 ]                # Higher values prevent splitting on single churn cases
-#      gamma: [ 1.5 ]                          # Minimum loss reduction to split; adds conservatism
-#      lambda: [ 1.0, 2.0 ]                         # L2 regularization to keep leaf weights stable
-#      alpha: [ 0.5 ]                          # L1 regularization for feature sparsity
-#      subsample: [ 0.6, 0.8 ]                      # Rows sampled per tree to increase robustness
-#      colsample_bytree: [ 0.8 ]               # Features sampled per tree
-#      learning_rate: [ 0.01 ]                 # Low rate + more estimators is better for fraud
-#      n_estimators: [ 500, 1000, 1500 ]       # More trees to capture complex patterns
-#      tree_method: [ "hist" ]
+  RandomForest:
+    type: "RandomForestClassifier"
+    params:
+      n_estimators: [ 500, 1000, 1500 ]                     # More trees help identify rare minority patterns
+      max_depth: [ 10, 15 ]                                 # Prevents memorizing noise in majority data
+      min_samples_leaf: [ 10 ]                              # Ensures leaves are statistically significant, reducing false positives
+      max_features: [ "sqrt", "log2" ]                      # Standard for diverse trees in ensemble
+      bootstrap: [ true ]
+      n_jobs: [ -1 ]                                        # Use all available CPU cores for speed
+
+
+  xgboost:
+    type: "XGBClassifier"
+    params:
+      scale_pos_weight: [ 73.4 ]
+      max_depth: [ 3, 6 ]                     # Shallow trees are more robust for rare events
+      min_child_weight: [ 10, 15, 20 ]                # Higher values prevent splitting on single churn cases
+      gamma: [ 1.5 ]                          # Minimum loss reduction to split; adds conservatism
+      lambda: [ 1.0, 2.0 ]                         # L2 regularization to keep leaf weights stable
+      alpha: [ 0.5 ]                          # L1 regularization for feature sparsity
+      subsample: [ 0.6, 0.8 ]                      # Rows sampled per tree to increase robustness
+      colsample_bytree: [ 0.8 ]               # Features sampled per tree
+      learning_rate: [ 0.01 ]                 # Low rate + more estimators is better for fraud
+      n_estimators: [ 500, 1000, 1500 ]       # More trees to capture complex patterns
+      tree_method: [ "hist" ]
 
 training:
   random_state: 42
@@ -48,4 +48,5 @@ output:
   test_feature_path: artifacts/features/test.csv
   preprocessor_path: artifacts/preprocessor/preprocessor.pkl
   model_path: models/best_model.pkl
+  threshold_path: artifacts/threshold/threshold.json
   metrics_path: artifacts/metrics/metrics.json

@@ -1,11 +1,11 @@
-# import modules
-import joblib
+# Import modules
 from pathlib import Path
+import joblib
+
+# Import libraries
+import pandas as pd
 
 from src.config import load_config
-
-# import libraries
-import pandas as pd
 
 
 def churn_probability(input_dict: dict) -> float:
@@ -16,7 +16,7 @@ def churn_probability(input_dict: dict) -> float:
     """
 
     # convert the input into an array
-    input_array = pd.Dataframe(input_dict)
+    input_array = pd.DataFrame(input_dict)
 
     # load the config file
     config = load_config()

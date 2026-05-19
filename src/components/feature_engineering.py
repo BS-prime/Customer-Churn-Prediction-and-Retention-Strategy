@@ -6,9 +6,9 @@ from pathlib import Path
 import pandas as pd
 from pandas import DataFrame, Series
 
-from src.config import load_config
-from src.exception import CustomException
-from src.logger import logging
+from config import load_config
+from exception import CustomException
+from logger import logging
 
 # load the config
 config = load_config()
@@ -21,15 +21,15 @@ ROOT_DIR = Path(__file__).parents[2]
 # --- 1. Separate input and output feature ---
 # =================================================================================================
 
-def _input_output_split(df: pd.DataFrame):
+def _input_output_split(df: pd.DataFrame | pd.Series):
     """
     Helper to split data into input and output features
     :param df: pandas.DataFrame
     :return: the input and output dataframe
     """
     try:
-        X = df.drop("Churn Value", axis=1)
-        y = df["Churn Value"]
+        X = df.drop("CustomerData Value", axis=1)
+        y = df["CustomerData Value"]
         logging.info(f"Dataframe split into input and output feature: {X.shape}, {y.shape}")
 
         return X, y
@@ -42,25 +42,25 @@ def _input_output_split(df: pd.DataFrame):
 # --- 2. Drop redundant features ---
 # =================================================================================================
 
-def _drop_redundant_features(X: pd.DataFrame):
+def _drop_redundant_features(x: pd.DataFrame | pd.Series):
     """
     Helper function to drop redundant features for model training
-    :param X: pd dataframe
+    :param x: pd dataframe
     :return: pd dataframe
     """
     try:
-        X = X.drop(columns=[
-            "Churn Label",
-            "Churn Reason",
+        x = x.drop(columns=[
+            "CustomerData Label",
+            "CustomerData Reason",
             'Latitude',
             'Longitude',
             'Lat Long',
             'Zip Code',
-            'Churn Score',
+            'CustomerData Score',
         ])
 
-        logging.info(f"Dropped redundant features: {X.shape}")
-        return X
+        logging.info(f"Dropped redundant features: {x.shape}")
+        return x
 
     except Exception as e:
         raise CustomException(e, sys)
@@ -70,10 +70,10 @@ def _drop_redundant_features(X: pd.DataFrame):
 # --- 3. Replace the services columns with number of services ---
 # =================================================================================================
 
-def _refactor_service_features(X: pd.DataFrame) -> pd.DataFrame:
+def _refactor_service_features(x: pd.DataFrame | pd.Series) -> pd.DataFrame | pd.Series:
     """
     Helper to create a new feature from how many services the customers have.
-    :param X: pd.DataFrame
+    :param x: pd.DataFrame
     :return: pd.DataFrame
     """
     # get the services feature
@@ -90,37 +90,37 @@ def _refactor_service_features(X: pd.DataFrame) -> pd.DataFrame:
     ]
 
     # Create a new service count feature
-    X["Service_count"] = (X[services_feature] != "No").sum(axis=1)
+    x["Service_count"] = (x[services_feature] != "No").sum(axis=1)
 
     # drop this redundant columns
-    X = X.drop(columns=services_feature)
+    x = x.drop(columns=services_feature)
 
-    logging.info(f"Refactored service feature: {X.shape}")
+    logging.info(f"Refactored service feature: {x.shape}")
 
-    return X
+    return x
 
 
 # =================================================================================================
 # --- 4. Refactor tenure month column into categories ---
 # =================================================================================================
 
-def _refactor_tenure_month_feature(X: pd.DataFrame) -> pd.DataFrame:
+def _refactor_tenure_month_feature(x: pd.DataFrame | pd.Series) -> pd.DataFrame | pd.Series:
     """
     Helper to refactor tenure month feature into categories
-    :param X: pd dataframe
+    :param x: pd dataframe
     :return: pd dataframe
     """
 
-    X["customer_loyalty"] = pd.cut(x=X["Tenure Months"],
+    x["customer_loyalty"] = pd.cut(x=x["Tenure Months"],
                                    bins=[0, 1, 2, 10, 29, 72],
                                    labels=["new", "seeker", "floater", "loyal", "extra_loyal"]
                                    )
 
-    X = X.drop(columns=["Tenure Months"])
+    x = x.drop(columns=["Tenure Months"])
 
-    logging.info(f"Refactored tenure month feature: {X.shape}")
+    logging.info(f"Refactored tenure month feature: {x.shape}")
 
-    return X
+    return x
 
 
 # =================================================================================================
@@ -128,8 +128,8 @@ def _refactor_tenure_month_feature(X: pd.DataFrame) -> pd.DataFrame:
 # =================================================================================================
 
 def feature_engineering(
-        df: pd.DataFrame
-) -> tuple[DataFrame, Series]:
+        df: pd.DataFrame | pd.Series,
+) -> tuple[DataFrame | Series, Series]:
     """
     Combine all the helpers to perform feature engineering
     :param df: pandas DataFrame
@@ -138,11 +138,11 @@ def feature_engineering(
 
     X, y = _input_output_split(df=df)
 
-    X = _drop_redundant_features(X=X)
+    X = _drop_redundant_features(x=X)
 
-    X = _refactor_service_features(X=X)
+    X = _refactor_service_features(x=X)
 
-    X = _refactor_tenure_month_feature(X=X)
+    X = _refactor_tenure_month_feature(x=X)
 
     logging.info(f"Feature engineering done: {X.shape}, {y.shape}")
 

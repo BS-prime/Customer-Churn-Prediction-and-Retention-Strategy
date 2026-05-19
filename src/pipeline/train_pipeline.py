@@ -2,6 +2,7 @@
 import sys
 from pathlib import Path
 
+from components import threshold_optimization
 # Import the functions
 from components.data_ingestion import load_excel
 from components.data_cleaning import data_cleaner
@@ -9,6 +10,7 @@ from components.data_preprocessing import preprocess_data
 from components.feature_engineering import feature_engineering
 from components.model_evaluation import evaluate_models
 from components.model_trainer import model_trainer
+from components.threshold_optimization import find_optimal_threshold
 
 from src.config import load_config
 from src.exception import CustomException
@@ -65,6 +67,7 @@ def run_training_pipeline():
         preprocessor_dir = ROOT_DIR / Path(config["output"]["preprocessor_path"])
         preprocessor_dir.parent.mkdir(parents=True, exist_ok=True)
 
+        # save the preprocessor
         save_object(
             filepath=preprocessor_dir,
             obj=preprocessor_obj
@@ -104,7 +107,18 @@ def run_training_pipeline():
         logging.info(f"Model saved at: {model_dir}")
 
         # -----------------------------------------------------------------------------------------------
-        # --- 8. Return statement ---
+        # --- 9. Threshold Optimization ---
+        # -----------------------------------------------------------------------------------------------
+
+        logging.info("Starting Pipeline: Threshold Optimization")
+
+        threshold_info = find_optimal_threshold(model=best_model,
+                                                x_test=X_test,
+                                                y_test=y_test
+                                                )
+
+        # -----------------------------------------------------------------------------------------------
+        # --- 9. Return statement ---
         # -----------------------------------------------------------------------------------------------
 
         return metrics
