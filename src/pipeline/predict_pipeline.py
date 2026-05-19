@@ -1,4 +1,5 @@
 # Import modules
+import json
 import pickle
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -12,8 +13,6 @@ from pydantic import BaseModel, Field
 
 from retention_strategy.rentention import retention_profit
 
-MODEL_VERSION = "BestModel_v1.0"
-
 # ==============================================================================
 # --- Model loading ---
 # ==============================================================================
@@ -24,20 +23,27 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 # define path
 preprocessor_path = ROOT_DIR.joinpath("artifacts/preprocessor/preprocessor.pkl")
 model_path = ROOT_DIR.joinpath("models/best_model.pkl")
+threshold_path = ROOT_DIR.joinpath("artifacts/threshold/threshold.json")
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(api: FastAPI):
     if not preprocessor_path.exists():
         raise RuntimeError(f"Preprocessor not found: {preprocessor_path}")
     if not model_path.exists():
         raise RuntimeError(f"Model not found: {model_path}")
+    if not threshold_path.exists():
+        raise RuntimeError(f"Threshold not found: {threshold_path}")
 
     with open(preprocessor_path, "rb") as f:
-        app.state.preprocessor = pickle.load(f)
+        api.state.preprocessor = pickle.load(f)
 
     with open(model_path, "rb") as f:
-        app.state.model = pickle.load(f)
+        api.state.model = pickle.load(f)
+
+    with open(threshold_path, "r") as f:
+        data = json.load(f)
+        api.state.threshold = data["best_threshold"]
 
     yield
 
@@ -151,9 +157,11 @@ async def predict_churn(ch: CustomerData):
 
         # make prediction
         probability = app.state.model.predict_proba(processed_input)[0, 1]
-        prediction = int(probability >= 0.5)
+
+        # Extract other info
+        prediction = int(probability >= app.state.threshold)
         profit = retention_profit(prob=probability)
-        should_target = profit > 0
+        should_target = (profit > 0)
 
         return PredictionResponse(
             model_version="1.0.0",

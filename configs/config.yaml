@@ -8,11 +8,10 @@ models:
   LogisticRegression: # This will be used in model naming after training.
     type: "LogisticRegression"
     params:
-      penalty: [ "l2" ]                         # Standard regularization to prevent overfitting
-      C: [ 1.0 ]                               # Inverse of regularization strength; 1.0 is a good default
-      solver: [ "lbfgs" ]                      # Efficient for small datasets and supports L2 penalty
-      max_iter: [ 1000 ]                      # Ensure convergence, especially with imbalanced data
-
+      C: [ 1.0 ]                                                   # Inverse of regularization strength; 1.0 is a good default
+      solver: ["lbfgs", "liblinear", "saga" ]                      # Efficient for small datasets and supports L2 penalty
+      max_iter: [ 100, 500, 1000 ]                                           # Ensure convergence, especially with imbalanced data
+      class_weight: [ "balanced", {0: 0.23, 1: 0.77} ]
 
   RandomForest:
     type: "RandomForestClassifier"

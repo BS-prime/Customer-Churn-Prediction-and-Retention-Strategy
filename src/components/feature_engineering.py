@@ -28,8 +28,8 @@ def _input_output_split(df: pd.DataFrame | pd.Series):
     :return: the input and output dataframe
     """
     try:
-        X = df.drop("CustomerData Value", axis=1)
-        y = df["CustomerData Value"]
+        X = df.drop("Churn Value", axis=1)
+        y = df["Churn Value"]
         logging.info(f"Dataframe split into input and output feature: {X.shape}, {y.shape}")
 
         return X, y
@@ -50,13 +50,13 @@ def _drop_redundant_features(x: pd.DataFrame | pd.Series):
     """
     try:
         x = x.drop(columns=[
-            "CustomerData Label",
-            "CustomerData Reason",
+            "Churn Label",
+            "Churn Reason",
             'Latitude',
             'Longitude',
             'Lat Long',
             'Zip Code',
-            'CustomerData Score',
+            'Churn Score',
         ])
 
         logging.info(f"Dropped redundant features: {x.shape}")

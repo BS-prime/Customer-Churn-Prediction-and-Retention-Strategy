@@ -1,17 +1,20 @@
 # import libraries
-import numpy as np
 import pandas as pd
 
+# import modules
 from logger import logging
 
 
 def _handle_missing_values(dataframe: pd.DataFrame) -> pd.DataFrame:
     """
-    Helper function to handle missing values with np.nans
-    :param dataframe:
-    :return:
+    Helper function to handle missing values in Total Charges feature with
+    0.0
+    :param dataframe: pandas.DataFrame
+    :return: pandas dataframe with missing values
     """
-    dataframe["Total Charges"] = dataframe["Total Charges"].replace(" ", np.nan)
+    dataframe["Total Charges"] = (dataframe["Total Charges"]
+                                  .replace(" ", 0.0)
+                                  ).infer_objects(copy=False)
 
     logging.info("Replace null values with np.nans")
 
@@ -20,14 +23,10 @@ def _handle_missing_values(dataframe: pd.DataFrame) -> pd.DataFrame:
 
 def _fixing_datatype(dataframe: pd.DataFrame) -> pd.DataFrame:
     """
-    Fixing datatypes in dataframe
+    Fixing datatypes in Total Charges feature
     :param dataframe:
-    :return:
+    :return: pandas dataframe with fixed datatypes
     """
-
-    # change the str datatype of each values
-    str_cols = dataframe.select_dtypes(include="str").columns
-    dataframe[str_cols] = dataframe[str_cols].astype(object)
 
     # Change the data type of the Total Charges feature
     dataframe["Total Charges"] = dataframe["Total Charges"].astype(float)
@@ -71,5 +70,7 @@ def data_cleaner(dataframe: pd.DataFrame) -> pd.DataFrame:
     dataframe = _handle_missing_values(dataframe)
     dataframe = _fixing_datatype(dataframe)
     dataframe = _drop_columns(dataframe)
+
+    logging.info("Data cleaning completed")
 
     return dataframe

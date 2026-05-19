@@ -23,7 +23,7 @@ def _make_prediction(model: pickle, x: pd.DataFrame) -> pd.Series:
 
     logging.info("Predicting...probabilities")
 
-    return model.predict_proba(x)[0, 1]
+    return model.predict_proba(x)[:, 1]
 
 
 def _calculate_cost(
@@ -57,7 +57,7 @@ def find_optimal_threshold(
         fn_cost: float = 10.0,
 ) -> dict[str, float]:
     """
-    Function to find optimal threshold to reduce cost.
+    Function to find optimal threshold to reduce cost and saves it in a json file
     :param fn_cost: float
     :param model: pickle object
     :param x_test: pandas.DataFrame

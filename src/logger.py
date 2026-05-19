@@ -10,7 +10,7 @@ LOGS_DIR = PROJECT_DIR / "logs"
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
 # 3. Define the full path to the log FILE
-LOG_FILE_NAME = f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.log"
+LOG_FILE_NAME = f"{datetime.now().strftime('%Y-%m-%d — %H-%M-%S')}.log"
 LOG_FILE_PATH = LOGS_DIR / LOG_FILE_NAME
 
 logging.basicConfig(

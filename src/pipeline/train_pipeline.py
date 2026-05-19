@@ -2,16 +2,15 @@
 import sys
 from pathlib import Path
 
-from components import threshold_optimization
 # Import the functions
-from components.data_ingestion import load_excel
 from components.data_cleaning import data_cleaner
+from components.data_ingestion import load_excel
 from components.data_preprocessing import preprocess_data
 from components.feature_engineering import feature_engineering
 from components.model_evaluation import evaluate_models
 from components.model_trainer import model_trainer
 from components.threshold_optimization import find_optimal_threshold
-
+# Import utils
 from src.config import load_config
 from src.exception import CustomException
 from src.logger import logging
@@ -21,10 +20,10 @@ from utils import save_object
 ROOT_DIR = Path(__file__).resolve().parents[2]
 
 
-def run_training_pipeline():
+def run_training_pipeline() -> tuple[dict, dict]:
     """
     Use different functions to run the training pipeline and save the models.
-    :return: best model metrics
+    :return: best model metrics and threshold info
     """
     try:
         config = load_config()
@@ -121,7 +120,7 @@ def run_training_pipeline():
         # --- 9. Return statement ---
         # -----------------------------------------------------------------------------------------------
 
-        return metrics
+        return metrics, threshold_info
 
     except Exception as e:
         raise CustomException(e, sys)
