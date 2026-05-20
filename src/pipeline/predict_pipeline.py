@@ -1,16 +1,17 @@
 # Import modules
 import json
-import pickle
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Literal
 
+import dill
 # Import libraries
 import pandas as pd
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+# Import functions
 from retention_strategy.rentention import retention_profit
 
 # ==============================================================================
@@ -36,10 +37,10 @@ async def lifespan(api: FastAPI):
         raise RuntimeError(f"Threshold not found: {threshold_path}")
 
     with open(preprocessor_path, "rb") as f:
-        api.state.preprocessor = pickle.load(f)
+        api.state.preprocessor = dill.load(f)
 
     with open(model_path, "rb") as f:
-        api.state.model = pickle.load(f)
+        api.state.model = dill.load(f)
 
     with open(threshold_path, "r") as f:
         data = json.load(f)
@@ -115,7 +116,7 @@ class CustomerData(BaseModel):
 class PredictionResponse(BaseModel):
     model_version: str
     churn_probability: float
-    prediction: int
+    will_churn: bool
     profit: int | float
     should_target: bool
 
@@ -159,15 +160,15 @@ async def predict_churn(ch: CustomerData):
         probability = app.state.model.predict_proba(processed_input)[0, 1]
 
         # Extract other info
-        prediction = int(probability >= app.state.threshold)
+        prediction = bool(int(probability >= app.state.threshold))
         profit = retention_profit(prob=probability)
         should_target = (profit > 0)
 
         return PredictionResponse(
             model_version="1.0.0",
-            churn_probability=probability,
-            prediction=prediction,
-            profit=profit,
+            churn_probability=round(probability, 4),
+            will_churn=prediction,
+            profit=round(profit, 2),
             should_target=should_target
         )
 
