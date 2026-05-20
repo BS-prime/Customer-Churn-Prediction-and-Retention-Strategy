@@ -6,9 +6,9 @@ from pathlib import Path
 import pandas as pd
 from pandas import DataFrame, Series
 
-from config import load_config
-from exception import CustomException
-from logger import logging
+from src.config import load_config
+from src.exception import CustomException
+from src.logger import logging
 
 # load the config
 config = load_config()

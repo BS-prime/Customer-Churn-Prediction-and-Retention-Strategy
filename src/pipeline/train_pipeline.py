@@ -3,18 +3,19 @@ import sys
 from pathlib import Path
 
 # Import the functions
-from components.data_cleaning import data_cleaner
-from components.data_ingestion import load_excel
-from components.data_preprocessing import preprocess_data
-from components.feature_engineering import feature_engineering
-from components.model_evaluation import evaluate_models
-from components.model_trainer import model_trainer
-from components.threshold_optimization import find_optimal_threshold
+from src.components.data_cleaning import data_cleaner
+from src.components.data_ingestion import load_excel
+from src.components.data_preprocessing import preprocess_data
+from src.components.feature_engineering import feature_engineering
+from src.components.model_evaluation import evaluate_models
+from src.components.model_trainer import model_trainer
+from src.components.threshold_optimization import save_threshold_info
+
 # Import utils
 from src.config import load_config
 from src.exception import CustomException
 from src.logger import logging
-from utils import save_object
+from src.utils import save_object
 
 # Locate the root directory
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -67,10 +68,7 @@ def run_training_pipeline() -> tuple[dict, dict]:
         preprocessor_dir.parent.mkdir(parents=True, exist_ok=True)
 
         # save the preprocessor
-        save_object(
-            filepath=preprocessor_dir,
-            obj=preprocessor_obj
-        )
+        save_object(filepath=preprocessor_dir, obj=preprocessor_obj)
 
         logging.info(f"Preprocessor saved at: {preprocessor_dir}")
 
@@ -86,7 +84,11 @@ def run_training_pipeline() -> tuple[dict, dict]:
         # -----------------------------------------------------------------------------------------------
 
         logging.info("Starting Pipeline: Model Evaluation")
-        best_model, metrics = evaluate_models(trained_models, X_test, y_test)
+        best_model, metrics, threshold_info = evaluate_models(
+            trained_models,
+            X_test,
+            y_test,
+        )
 
         # -----------------------------------------------------------------------------------------------
         # --- 7. save the model ---
@@ -98,10 +100,7 @@ def run_training_pipeline() -> tuple[dict, dict]:
         model_dir = ROOT_DIR / Path(config["output"]["model_path"])
         model_dir.parent.mkdir(parents=True, exist_ok=True)
 
-        save_object(
-            filepath=model_dir,
-            obj=best_model
-        )
+        save_object(filepath=model_dir, obj=best_model)
 
         logging.info(f"Model saved at: {model_dir}")
 
@@ -109,12 +108,8 @@ def run_training_pipeline() -> tuple[dict, dict]:
         # --- 9. Threshold Optimization ---
         # -----------------------------------------------------------------------------------------------
 
-        logging.info("Starting Pipeline: Threshold Optimization")
-
-        threshold_info = find_optimal_threshold(model=best_model,
-                                                x_test=X_test,
-                                                y_test=y_test
-                                                )
+        logging.info("Saving Selected Model Threshold")
+        save_threshold_info(threshold_info)
 
         # -----------------------------------------------------------------------------------------------
         # --- 9. Return statement ---

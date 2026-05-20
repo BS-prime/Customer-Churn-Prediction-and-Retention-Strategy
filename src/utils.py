@@ -4,7 +4,7 @@ from pathlib import Path
 
 import dill
 
-from exception import CustomException
+from src.exception import CustomException
 
 
 def save_object(filepath: Path | str, obj):

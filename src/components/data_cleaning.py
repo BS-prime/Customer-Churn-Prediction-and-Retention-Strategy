@@ -2,7 +2,7 @@
 import pandas as pd
 
 # import modules
-from logger import logging
+from src.logger import logging
 
 
 def _handle_missing_values(dataframe: pd.DataFrame) -> pd.DataFrame:

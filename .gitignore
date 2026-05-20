@@ -6,6 +6,7 @@ dist/
 wheels/
 *.egg-info
 .idea
+.pytest_cache
 
 # projects redundancies
 logs/

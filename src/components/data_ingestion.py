@@ -6,8 +6,8 @@ from pathlib import Path
 # import libraries
 import pandas as pd
 
-from exception import CustomException
 from src.config import load_config
+from src.exception import CustomException
 
 # initiate the config
 config = load_config()
