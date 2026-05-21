@@ -7,6 +7,7 @@ from src.components.data_cleaning import data_cleaner
 from src.components.data_ingestion import load_excel
 from src.components.data_preprocessing import preprocess_data
 from src.components.feature_engineering import feature_engineering
+from src.components.model_explainability import save_shap_summary_plot
 from src.components.model_evaluation import evaluate_models
 from src.components.model_trainer import model_trainer
 from src.components.threshold_optimization import save_threshold_info
@@ -112,7 +113,18 @@ def run_training_pipeline() -> tuple[dict, dict]:
         save_threshold_info(threshold_info)
 
         # -----------------------------------------------------------------------------------------
-        # --- 9. Return statement ---
+        # --- 9. Model Explainability ---
+        # -----------------------------------------------------------------------------------------
+
+        logging.info("Saving SHAP Summary Plot")
+        save_shap_summary_plot(
+            model=best_model,
+            X=X_test,
+            preprocessor=preprocessor_obj,
+        )
+
+        # -----------------------------------------------------------------------------------------
+        # --- 10. Return statement ---
         # -----------------------------------------------------------------------------------------
 
         return metrics, threshold_info

@@ -21,6 +21,22 @@ PREPROCESSOR_PATH = ROOT_DIR / "artifacts/preprocessor/preprocessor.pkl"
 MODEL_PATH = ROOT_DIR / "models/best_model.pkl"
 THRESHOLD_PATH = ROOT_DIR / "artifacts/threshold/threshold.json"
 
+EXPECTED_MODEL_FEATURES = [
+    "City",
+    "Gender",
+    "Senior Citizen",
+    "Partner",
+    "Dependents",
+    "Contract",
+    "Paperless Billing",
+    "Payment Method",
+    "Monthly Charges",
+    "Total Charges",
+    "CLTV",
+    "Service_count",
+    "customer_loyalty",
+]
+
 
 class ChurnPredictor:
     """
@@ -40,7 +56,7 @@ class ChurnPredictor:
         self.model_version = model_version
 
     @classmethod
-    def from_artifacts(
+    def load_artifacts(
         cls,
         preprocessor_path: Path = PREPROCESSOR_PATH,
         model_path: Path = MODEL_PATH,
@@ -71,11 +87,41 @@ class ChurnPredictor:
             threshold=threshold_data["best_threshold"],
         )
 
+    def _expected_features(self) -> list[str]:
+        """
+        Helper to extract the feature names.
+        """
+        artifact_features = getattr(self.preprocessor, "feature_names_in_", None)
+
+        if artifact_features is None:
+            return EXPECTED_MODEL_FEATURES
+
+        return list(artifact_features)
+
+    def _validate_features(self, raw_features: dict[str, Any]) -> dict[str, Any]:
+        """
+        Helper function to validate the expected features.
+        """
+        expected_features = self._expected_features()
+        incoming_features = set(raw_features)
+        missing_features = [
+            feature for feature in expected_features if feature not in incoming_features
+        ]
+        extra_features = sorted(incoming_features - set(expected_features))
+
+        if missing_features:
+            raise ValueError(f"Missing required model features: {missing_features}")
+        if extra_features:
+            raise ValueError(f"Unexpected model features: {extra_features}")
+
+        return {feature: raw_features[feature] for feature in expected_features}
+
     def predict(self, raw_features: dict[str, Any]) -> dict[str, float | bool | str]:
         """
         Score one customer and return churn and retention decision outputs.
         """
-        user_input = pd.DataFrame([raw_features])
+        validated_features = self._validate_features(raw_features)
+        user_input = pd.DataFrame([validated_features])
         processed_input = self.preprocessor.transform(user_input)
 
         probability = self.model.predict_proba(processed_input)[0, 1]

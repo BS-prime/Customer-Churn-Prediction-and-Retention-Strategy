@@ -49,3 +49,4 @@ output:
   model_path: models/best_model.pkl
   threshold_path: artifacts/threshold/threshold.json
   metrics_path: artifacts/metrics/metrics.json
+  explainability_path: artifacts/explainability/shap_summary.png

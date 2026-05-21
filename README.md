@@ -124,7 +124,7 @@ This means the project currently favors catching more churners, because missing 
 The retention strategy is implemented in:
 
 ```text
-src/retention_strategy/rentention.py
+src/retention_strategy/retention.py
 ```
 
 The expected profit formula is:
@@ -149,6 +149,7 @@ A customer can be targeted when the expected retention profit is positive.
 .
 |-- artifacts/
 |   |-- features/              # Transformed train and test features
+|   |-- explainability/        # Saved SHAP summary plot
 |   |-- metrics/               # Saved model evaluation metrics
 |   |-- preprocessor/          # Saved preprocessing object
 |   `-- threshold/             # Saved optimal threshold
@@ -210,6 +211,7 @@ The pipeline will create or update:
 - `models/best_model.pkl`
 - `artifacts/metrics/metrics.json`
 - `artifacts/threshold/threshold.json`
+- `artifacts/explainability/shap_summary.png`
 
 ## How to Run the FastAPI Prediction Service
 
@@ -316,6 +318,7 @@ The notebooks document the experimentation process:
 - Separate preprocessing for numeric, categorical, and high-cardinality features.
 - Cost-sensitive threshold optimization.
 - Retention profit calculation for business decision-making.
+- SHAP summary plot for model explainability.
 - FastAPI prediction service for real-time churn scoring.
 - Saved artifacts for reproducibility and reuse.
 - Logs for pipeline traceability.
@@ -324,7 +327,7 @@ The notebooks document the experimentation process:
 
 - Add a Streamlit interface or simple frontend for scoring new customers.
 - Add automated tests for each pipeline component.
-- Add model explainability using SHAP or feature importance reports.
+- Add detailed SHAP dependence plots for deeper model explainability.
 - Improve best-model selection with a clearer cost-sensitive objective.
 - Track experiments with MLflow or another experiment registry.
 

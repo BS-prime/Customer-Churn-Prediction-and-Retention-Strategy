@@ -5,25 +5,29 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 
+MODEL_FEATURES = [
+    "City",
+    "Gender",
+    "Senior Citizen",
+    "Partner",
+    "Dependents",
+    "Contract",
+    "Paperless Billing",
+    "Payment Method",
+    "Monthly Charges",
+    "Total Charges",
+    "CLTV",
+    "Service_count",
+    "customer_loyalty",
+]
+
+
 class CustomerData(BaseModel):
     MonthlyCharges: float | int = Field(default=100, gt=0, title="Monthly Charges")
     TotalCharges: float | int = Field(default=1000, gt=0, title="Total Charges")
     CLTV: float | int = Field(default=4226, gt=0, title="CLTV")
-    ServiceCount: int = Field(default=1, gt=0, title="Service count")
-    City: Literal[
-        "Los Angeles",
-        "San Diego",
-        "San Jose",
-        "Sacramento",
-        "San Francisco",
-        "Fresno",
-        "Long Beach",
-        "Oakland",
-        "Stockton",
-        "Glendale",
-        "Bakersfield",
-        "Riverside",
-    ] = "Los Angeles"
+    ServiceCount: int = Field(default=1, ge=0, title="Service count")
+    City: str = Field(default="Los Angeles", min_length=1)
     Gender: Literal["Male", "Female"] = "Male"
     SeniorCitizen: Literal["Yes", "No"] = "No"
     Partner: Literal["Yes", "No"] = "No"
@@ -45,7 +49,7 @@ class CustomerData(BaseModel):
     ] = "new"
 
     def to_model_features(self) -> dict:
-        return {
+        features = {
             "Monthly Charges": self.MonthlyCharges,
             "Total Charges": self.TotalCharges,
             "CLTV": self.CLTV,
@@ -60,6 +64,8 @@ class CustomerData(BaseModel):
             "Payment Method": self.PaymentMethod,
             "customer_loyalty": self.CustomerLoyalty,
         }
+
+        return {feature: features[feature] for feature in MODEL_FEATURES}
 
 
 class PredictionResponse(BaseModel):
