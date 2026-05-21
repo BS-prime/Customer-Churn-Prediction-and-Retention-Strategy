@@ -170,6 +170,7 @@ A customer can be targeted when the expected retention profit is positive.
 |   |-- components/            # Modular ML pipeline components
 |   |-- pipeline/              # Training and reusable prediction logic
 |   |-- retention_strategy/    # Churn probability and retention profit logic
+|   |-- ui/                    # Streamlit customer scoring interface
 |   |-- config.py
 |   |-- exception.py
 |   |-- logger.py
@@ -270,6 +271,22 @@ Example response:
 }
 ```
 
+## How to Run the Streamlit App
+
+The project includes a Streamlit app in:
+
+```text
+src/ui/streamlit_app.py
+```
+
+Start the app from the project root:
+
+```bash
+streamlit run src/ui/streamlit_app.py
+```
+
+The app loads the saved model artifacts, accepts customer details, and returns churn probability, churn decision, expected retention profit, and targeting recommendation.
+
 ## How to Run Tests
 
 Run the focused test suite with the development extra:
@@ -320,12 +337,12 @@ The notebooks document the experimentation process:
 - Retention profit calculation for business decision-making.
 - SHAP summary plot for model explainability.
 - FastAPI prediction service for real-time churn scoring.
+- Streamlit interface for customer scoring.
 - Saved artifacts for reproducibility and reuse.
 - Logs for pipeline traceability.
 
 ## Future Improvements
 
-- Add a Streamlit interface or simple frontend for scoring new customers.
 - Add automated tests for each pipeline component.
 - Add detailed SHAP dependence plots for deeper model explainability.
 - Improve best-model selection with a clearer cost-sensitive objective.

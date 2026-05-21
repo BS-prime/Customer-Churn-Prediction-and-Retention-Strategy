@@ -10,7 +10,7 @@ from src.pipeline.predict_pipeline import ChurnPredictor
 
 @asynccontextmanager
 async def lifespan(api: FastAPI):
-    api.state.predictor = ChurnPredictor.from_artifacts()
+    api.state.predictor = ChurnPredictor.load_artifacts()
     yield
 
 

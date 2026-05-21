@@ -76,16 +76,18 @@ def test_predictor_rejects_extra_features():
         model=FakeModel(),
         threshold=0.5,
     )
-    raw_features = {
+    raw_features: dict[str, int | str] = {
         feature: "No" for feature in FakePreprocessor.feature_names_in_
     }
-    raw_features.update({
-        "Monthly Charges": 100,
-        "Total Charges": 1000,
-        "CLTV": 4226,
-        "Service_count": 1,
-        "Extra": "unexpected",
-    })
+    raw_features.update(
+        {
+            "Monthly Charges": 100,
+            "Total Charges": 1000,
+            "CLTV": 4226,
+            "Service_count": 1,
+            "Extra": "unexpected",
+        }
+    )
 
     with pytest.raises(ValueError, match="Unexpected model features"):
         predictor.predict(raw_features)

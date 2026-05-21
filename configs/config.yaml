@@ -27,7 +27,7 @@ models:
   xgboost:
     type: "XGBClassifier"
     params:
-      scale_pos_weight: [ 73.4 ]
+      scale_pos_weight: [ 2.76 ]
       max_depth: [ 3, 6 ]                     # Shallow trees are more robust for rare events
       min_child_weight: [ 10, 15, 20 ]                # Higher values prevent splitting on single churn cases
       gamma: [ 1.5 ]                          # Minimum loss reduction to split; adds conservatism
