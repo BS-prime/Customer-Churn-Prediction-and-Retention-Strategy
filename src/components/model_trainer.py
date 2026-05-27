@@ -12,10 +12,7 @@ from src.exception import CustomException
 from src.logger import logging
 
 
-def model_trainer(
-        X_train: pd.DataFrame,
-        y_train: pd.Series
-) -> list:
+def model_trainer(X_train: pd.DataFrame, y_train: pd.Series) -> list:
     try:
         config_file = load_config()
         # map config to actual sklearn classes

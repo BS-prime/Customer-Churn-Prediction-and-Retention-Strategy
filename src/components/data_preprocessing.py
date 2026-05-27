@@ -31,10 +31,10 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 
 
 def _train_test_split(
-        X: pd.DataFrame,
-        y: pd.Series,
-        test_size: float = config["data"]["test_size"],
-        random_state: int = config["data"]["random_state"]
+    X: pd.DataFrame,
+    y: pd.Series,
+    test_size: float = config["data"]["test_size"],
+    random_state: int = config["data"]["random_state"],
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
     """
     Helper function to split data into train and test
@@ -45,18 +45,16 @@ def _train_test_split(
     :return: X_train, X_test, y_train, y_test
     """
     try:
-        X_train, X_test, y_train, y_test = train_test_split(X,
-                                                            y,
-                                                            stratify=y,
-                                                            test_size=test_size,
-                                                            random_state=random_state
-                                                            )
-        logging.info(f"Dataframe split into train and test: "
-                     f"{X_train.shape}, "
-                     f"{X_test.shape}, "
-                     f"{y_train.shape}, "
-                     f"{y_test.shape}"
-                     )
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, stratify=y, test_size=test_size, random_state=random_state
+        )
+        logging.info(
+            f"Dataframe split into train and test: "
+            f"{X_train.shape}, "
+            f"{X_test.shape}, "
+            f"{y_train.shape}, "
+            f"{y_test.shape}"
+        )
 
         return X_train, X_test, y_train, y_test
 
@@ -65,10 +63,13 @@ def _train_test_split(
 
 
 # =================================================================================================
-# --- 6. Select features based on datatype ---
+# --- 2. Select features based on datatype ---
 # =================================================================================================
 
-def _select_datatypes_columns(X: pd.DataFrame) -> tuple[list[str], list[str], list[str]]:
+
+def _select_datatypes_columns(
+    X: pd.DataFrame,
+) -> tuple[list[str], list[str], list[str]]:
     """
     Helper to select columns of numerical and categorical data types from a pd dataframe
     :param X: pd dataframe
@@ -97,8 +98,9 @@ def _select_datatypes_columns(X: pd.DataFrame) -> tuple[list[str], list[str], li
 
 
 # =================================================================================================
-# --- 7. Create pipelines for different datatypes ---
+# --- 3. Create pipelines for different datatypes ---
 # =================================================================================================
+
 
 def _create_pipelines() -> tuple[Pipeline, Pipeline, Pipeline]:
     """
@@ -106,23 +108,25 @@ def _create_pipelines() -> tuple[Pipeline, Pipeline, Pipeline]:
     :return: num_pipeline, cat_pipeline, card_pipeline
     """
     try:
-        num_pipeline = Pipeline([
-            ("imputer", SimpleImputer(strategy="median")),
-            ("scaler", StandardScaler()),
-        ])
+        num_pipeline = Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="median")),
+                ("scaler", StandardScaler()),
+            ]
+        )
 
         logging.info(f"Steps of numerical pipeline: {num_pipeline.steps}")
 
-        cat_pipeline = Pipeline([
-            ("imputer", SimpleImputer(strategy="most_frequent")),
-            ("onehot", OneHotEncoder(drop="first")),
-        ])
+        cat_pipeline = Pipeline(
+            [
+                ("imputer", SimpleImputer(strategy="most_frequent")),
+                ("onehot", OneHotEncoder(drop="first")),
+            ]
+        )
 
         logging.info(f"Steps of categorical pipeline: {cat_pipeline.steps}")
 
-        card_pipeline = Pipeline([
-            ("target_encoder", ce.TargetEncoder(smoothing=10))
-        ])
+        card_pipeline = Pipeline([("target_encoder", ce.TargetEncoder(smoothing=10))])
 
         logging.info(f"Steps of cardinal pipeline: {card_pipeline.steps}")
 
@@ -133,16 +137,17 @@ def _create_pipelines() -> tuple[Pipeline, Pipeline, Pipeline]:
 
 
 # =================================================================================================
-# --- 8. Create preprocessor out of those pipelines ---
+# --- 4. Create preprocessor out of those pipelines ---
 # =================================================================================================
 
+
 def _create_preprocessor(
-        num_pipeline: Pipeline,
-        cat_pipeline: Pipeline,
-        card_pipeline: Pipeline,
-        cat_columns: list[str],
-        num_columns: list[str],
-        card_columns: list[str],
+    num_pipeline: Pipeline,
+    cat_pipeline: Pipeline,
+    card_pipeline: Pipeline,
+    cat_columns: list[str],
+    num_columns: list[str],
+    card_columns: list[str],
 ) -> ColumnTransformer:
     """
     Helper to combine all the pipelines to create a preprocessor
@@ -152,11 +157,14 @@ def _create_preprocessor(
     :return: Returns a ColumnTransformer object
     """
     try:
-        preprocessor = ColumnTransformer([
-            ("num", num_pipeline, num_columns),
-            ("cat", cat_pipeline, cat_columns),
-            ("card", card_pipeline, card_columns),
-        ], sparse_threshold=0)
+        preprocessor = ColumnTransformer(
+            [
+                ("num", num_pipeline, num_columns),
+                ("cat", cat_pipeline, cat_columns),
+                ("card", card_pipeline, card_columns),
+            ],
+            sparse_threshold=0,
+        )
 
         logging.info("Preprocessor initialized}")
 
@@ -167,16 +175,17 @@ def _create_preprocessor(
 
 
 # =================================================================================================
-# --- 9. Using preprocessor to transform the data ---
+# --- 5. Using preprocessor to transform the data ---
 # =================================================================================================
 
+
 def _initiate_data_transformation(
-        preprocessor_obj: ColumnTransformer,
-        X_train: pd.DataFrame,
-        y_train: pd.Series,
-        X_test: pd.DataFrame,
-        y_test: pd.Series,
-        config_data=config["output"],
+    preprocessor_obj: ColumnTransformer,
+    X_train: pd.DataFrame,
+    y_train: pd.Series,
+    X_test: pd.DataFrame,
+    y_test: pd.Series,
+    config_data=config["output"],
 ) -> tuple[Any, Any, ColumnTransformer]:
     """
     Helper to transform the data, save features to csv files
@@ -202,36 +211,29 @@ def _initiate_data_transformation(
         logging.info(f"training features created: {train_arr.shape}")
         logging.info(f"testing features created: {test_arr.shape}")
 
-
-
         # save feature engineered data
         train_dir = ROOT_DIR / Path(config_data["train_feature_path"]).parent
         train_dir.mkdir(parents=True, exist_ok=True)
 
         # saving to csv
         pd.DataFrame(train_arr).to_csv(
-            train_dir / "train.csv",
-            index=False,
-            header=False
+            train_dir / "train.csv", index=False, header=False
         )
 
         test_dir = ROOT_DIR / Path(config_data["test_feature_path"]).parent
         test_dir.mkdir(parents=True, exist_ok=True)
 
-        pd.DataFrame(test_arr).to_csv(
-            test_dir / "test.csv",
-            index=False,
-            header=False
-        )
+        pd.DataFrame(test_arr).to_csv(test_dir / "test.csv", index=False, header=False)
 
-        return (
-            train_arr,
-            test_arr,
-            preprocessor_obj
-        )
+        return (train_arr, test_arr, preprocessor_obj)
 
     except Exception as e:
         raise CustomException(e, sys)
+
+
+# =================================================================================================
+# --- 6. Final execution ---
+# =================================================================================================
 
 
 def preprocess_data(X, y) -> tuple[Any, Any, Any, Any, Any]:
@@ -247,20 +249,22 @@ def preprocess_data(X, y) -> tuple[Any, Any, Any, Any, Any]:
 
     num_pipeline, cat_pipeline, card_pipeline = _create_pipelines()
 
-    preprocessor_obj = _create_preprocessor(num_pipeline=num_pipeline,
-                                            cat_pipeline=cat_pipeline,
-                                            card_pipeline=card_pipeline,
-                                            card_columns=card_columns,
-                                            num_columns=num_columns,
-                                            cat_columns=cat_columns
-                                            )
+    preprocessor_obj = _create_preprocessor(
+        num_pipeline=num_pipeline,
+        cat_pipeline=cat_pipeline,
+        card_pipeline=card_pipeline,
+        card_columns=card_columns,
+        num_columns=num_columns,
+        cat_columns=cat_columns,
+    )
 
-    train_arr, test_arr, preprocessor_obj = _initiate_data_transformation(preprocessor_obj=preprocessor_obj,
-                                                        X_train=X_train,
-                                                        y_train=y_train,
-                                                        X_test=X_test,
-                                                        y_test=y_test,
-                                                        )
+    train_arr, test_arr, preprocessor_obj = _initiate_data_transformation(
+        preprocessor_obj=preprocessor_obj,
+        X_train=X_train,
+        y_train=y_train,
+        X_test=X_test,
+        y_test=y_test,
+    )
 
     # train test split the preprocessed data
     X_train = train_arr[:, :-1]
