@@ -24,6 +24,20 @@ Instead of treating churn prediction as a purely technical classification task, 
 - The final threshold is selected by minimizing a custom cost function.
 - Retention profit is estimated using churn probability, offer cost, monthly revenue, retention success rate, and expected retained months.
 
+## Key Highlights
+
+- **End-to-end ML pipeline**: ingestion, cleaning, feature engineering, preprocessing, model training, model evaluation, threshold optimization, artifact saving, and explainability.
+- **Strong churn benchmark**: Logistic Regression achieved the best saved benchmark with `ROC-AUC = 0.8304`, `Recall = 0.7567`, and `F1 Score = 0.6112`.
+- **Imbalance-aware validation**: the training process uses a stratified train-test split and recall/F1-oriented model selection to better handle churn class imbalance.
+- **Leakage-conscious feature engineering**: churn outcome and post-churn fields such as `Churn Label`, `Churn Reason`, and `Churn Score` are dropped before modeling.
+- **Business-aware thresholding**: the final decision threshold is selected by minimizing a custom cost function where missed churners are treated as more expensive than unnecessary offers.
+- **Retention strategy layer**: churn probabilities are converted into expected retention profit and a clear target-or-skip recommendation.
+- **FastAPI inference service**: exposes health and single-customer prediction endpoints with Pydantic request and response validation.
+- **Streamlit decision dashboard**: supports interactive customer scoring with churn probability, churn decision, expected profit, and targeting recommendation.
+- **Explainable ML**: saves a SHAP summary plot to show which transformed features influence churn predictions.
+- **Config-driven design**: model grids, training settings, input paths, and artifact paths are managed through `configs/config.yaml`.
+- **Reproducible artifacts**: saves transformed features, the trained model, preprocessing object, metrics, optimized threshold, SHAP plot, and pipeline logs.
+
 ## Dataset
 
 The project uses the Telco customer churn dataset stored at:
@@ -325,21 +339,6 @@ The notebooks document the experimentation process:
 - `preprocessing.ipynb`: preprocessing experiments.
 - `feature_engineering.ipynb`: feature creation and transformation ideas.
 - `model_training_and_evaluation.ipynb`: model training and comparison.
-
-## Key Highlights
-
-- Modular production-style pipeline.
-- Config-driven model training and artifact paths.
-- Multiple model comparison with hyperparameter tuning.
-- Stratified split for churn imbalance.
-- Separate preprocessing for numeric, categorical, and high-cardinality features.
-- Cost-sensitive threshold optimization.
-- Retention profit calculation for business decision-making.
-- SHAP summary plot for model explainability.
-- FastAPI prediction service for real-time churn scoring.
-- Streamlit interface for customer scoring.
-- Saved artifacts for reproducibility and reuse.
-- Logs for pipeline traceability.
 
 ## Future Improvements
 
