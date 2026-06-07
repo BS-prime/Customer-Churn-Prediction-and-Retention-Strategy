@@ -13,6 +13,7 @@ logs/
 reports/
 artifacts/*
 !artifacts/preprocessor
+!artifacts/threshold
 data/
 
 # Virtual environments
