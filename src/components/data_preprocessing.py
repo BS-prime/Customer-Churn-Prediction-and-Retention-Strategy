@@ -198,10 +198,8 @@ def _initiate_data_transformation(
     :return: transformed train array, transformed test array, and file path to preprocessor object
     """
     try:
-        # Fit preprocessor to the training data USING y_train for the TargetEncoder
         input_feature_train_arr = preprocessor_obj.fit_transform(X_train, y_train)
 
-        # Transform the test data
         input_feature_test_arr = preprocessor_obj.transform(X_test)
 
         # Concatenate transformed features with their respective target variables
@@ -211,11 +209,10 @@ def _initiate_data_transformation(
         logging.info(f"training features created: {train_arr.shape}")
         logging.info(f"testing features created: {test_arr.shape}")
 
-        # save feature engineered data
+        # save features
         train_dir = ROOT_DIR / Path(config_data["train_feature_path"]).parent
         train_dir.mkdir(parents=True, exist_ok=True)
 
-        # saving to csv
         pd.DataFrame(train_arr).to_csv(
             train_dir / "train.csv", index=False, header=False
         )

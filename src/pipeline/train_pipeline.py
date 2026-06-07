@@ -74,14 +74,14 @@ def run_training_pipeline() -> tuple[dict, dict]:
         logging.info(f"Preprocessor saved at: {preprocessor_dir}")
 
         # -----------------------------------------------------------------------------------------
-        # --- 5. Model Training ---
+        # --- 6. Model Training ---
         # -----------------------------------------------------------------------------------------
 
         logging.info("Starting Pipeline: Model Training")
         trained_models = model_trainer(X_train, y_train)
 
         # -----------------------------------------------------------------------------------------
-        # --- 6. Model Evaluation ---
+        # --- 7. Model Evaluation ---
         # -----------------------------------------------------------------------------------------
 
         logging.info("Starting Pipeline: Model Evaluation")
@@ -92,7 +92,7 @@ def run_training_pipeline() -> tuple[dict, dict]:
         )
 
         # -----------------------------------------------------------------------------------------
-        # --- 7. save the model ---
+        # --- 8. save the model ---
         # -----------------------------------------------------------------------------------------
 
         logging.info("Saving the model.")
@@ -106,14 +106,14 @@ def run_training_pipeline() -> tuple[dict, dict]:
         logging.info(f"Model saved at: {model_dir}")
 
         # -----------------------------------------------------------------------------------------
-        # --- 8. Threshold Optimization ---
+        # --- 9. Threshold Optimization ---
         # -----------------------------------------------------------------------------------------
 
         logging.info("Saving Selected Model Threshold")
         save_threshold_info(threshold_info)
 
         # -----------------------------------------------------------------------------------------
-        # --- 9. Model Explainability ---
+        # --- 10. Model Explainability ---
         # -----------------------------------------------------------------------------------------
 
         logging.info("Saving SHAP Summary Plot")
@@ -124,7 +124,7 @@ def run_training_pipeline() -> tuple[dict, dict]:
         )
 
         # -----------------------------------------------------------------------------------------
-        # --- 10. Return statement ---
+        # --- 11. Return statement ---
         # -----------------------------------------------------------------------------------------
 
         return metrics, threshold_info

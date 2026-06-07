@@ -89,7 +89,7 @@ class ChurnPredictor:
 
     def _expected_features(self) -> list[str]:
         """
-        Helper to extract the feature names.
+        Helper to extract the feature names from the preprocessor.
         """
         artifact_features = getattr(self.preprocessor, "feature_names_in_", None)
 
@@ -100,7 +100,7 @@ class ChurnPredictor:
 
     def _validate_features(self, raw_features: dict[str, Any]) -> dict[str, Any]:
         """
-        Helper function to validate the expected features.
+        Helper function to validate the input features
         """
         expected_features = self._expected_features()
         incoming_features = set(raw_features)
