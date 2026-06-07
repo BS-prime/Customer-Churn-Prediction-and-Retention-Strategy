@@ -11,7 +11,8 @@ wheels/
 # projects redundancies
 logs/
 reports/
-artifacts/
+artifacts/*
+!artifacts/preprocessor
 data/
 
 # Virtual environments
